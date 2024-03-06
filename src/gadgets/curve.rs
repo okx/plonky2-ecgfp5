@@ -17,7 +17,7 @@ use super::base_field::PartialWitnessQuinticExt;
 
 #[derive(Copy, Clone, Debug)]
 #[repr(transparent)]
-pub struct CurveTarget(([QuinticExtensionTarget; 2], BoolTarget));
+pub struct CurveTarget(pub([QuinticExtensionTarget; 2], BoolTarget));
 
 pub trait CircuitBuilderEcGFp5 {
     fn add_virtual_curve_target(&mut self) -> CurveTarget;
