@@ -1,7 +1,7 @@
 // toy example of a circuit that checks a schnorr signatuse
 
 use log::Level;
-use plonky2::{plonk::{config::{Hasher, PoseidonGoldilocksConfig, GenericConfig, GenericHashOut}, circuit_data::{CircuitConfig, CircuitData}, circuit_builder::CircuitBuilder, prover::prove}, iop::{witness::PartialWitness, target::Target}, util::timing::{self, TimingTree}, hash::{hash_types::HashOut, hashing::{SPONGE_WIDTH, hash_n_to_hash_no_pad, hash_n_to_m_no_pad}, poseidon::PoseidonPermutation}};
+use plonky2::{hash::{hash_types::HashOut, hashing::{hash_n_to_hash_no_pad, hash_n_to_m_no_pad, SPONGE_WIDTH}, poseidon::{PoseidonHash, PoseidonPermutation}}, iop::{target::Target, witness::PartialWitness}, plonk::{circuit_builder::CircuitBuilder, circuit_data::{CircuitConfig, CircuitData}, config::{GenericConfig, GenericHashOut, Hasher, PoseidonGoldilocksConfig}, prover::prove}, util::timing::{self, TimingTree}};
 use plonky2_ecdsa::gadgets::{nonnative::CircuitBuilderNonNative, biguint::WitnessBigUint};
 use plonky2_ecgfp5::{curve::{scalar_field::Scalar, curve::Point}, gadgets::{curve::{CircuitBuilderEcGFp5, PartialWitnessCurve}, scalar_field::CircuitBuilderScalar, base_field::{CircuitBuilderGFp5, QuinticExtensionTarget, PartialWitnessQuinticExt}}};
 use plonky2_field::{types::{Field, Sample, PrimeField}, extension::quintic::QuinticExtension};
@@ -27,22 +27,23 @@ fn sig_hash(message: &[F]) -> [F; 5] {
 }
 
 fn sig_hash_circuit(builder: &mut CircuitBuilder<F, D>, message: &[Target]) -> [Target; 5] {
-	let mut state = [(); SPONGE_WIDTH].map(|_| builder.zero());
+	builder.hash_n_to_m_no_pad::<PoseidonHash>(message.to_vec(), 5).try_into().unwrap()
+	// let mut state = [(); SPONGE_WIDTH].map(|_| builder.zero());
 
-    // Absorb all input chunks.
-    for input_chunk in message.chunks(SPONGE_RATE) {
-        state[..input_chunk.len()].copy_from_slice(input_chunk);
-        state = builder.permute::<<PoseidonGoldilocksConfig as GenericConfig<D>>::Hasher>(state);
-    }
+    // // Absorb all input chunks.
+    // for input_chunk in message.chunks(SPONGE_RATE) {
+    //     state[..input_chunk.len()].copy_from_slice(input_chunk);
+    //     state = builder.permute::<<PoseidonGoldilocksConfig as GenericConfig<D>>::Hasher>(state);
+    // }
 
-    // Squeeze until we have the desired number of outputs.
-	[
-		state[0],
-		state[1],
-		state[2],
-		state[3],
-		state[4],
-	]
+    // // Squeeze until we have the desired number of outputs.
+	// [
+	// 	state[0],
+	// 	state[1],
+	// 	state[2],
+	// 	state[3],
+	// 	state[4],
+	// ]
 }
 
 pub fn main() {
