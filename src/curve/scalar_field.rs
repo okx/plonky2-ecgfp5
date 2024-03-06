@@ -221,6 +221,16 @@ impl Field for Scalar {
     fn from_noncanonical_u96(n: (u64, u32)) -> Self {
         Self([n.0, n.1 as u64, 0, 0, 0])
     }
+
+    #[inline]
+    fn from_noncanonical_i64(n: i64) -> Self {
+        Self::from_canonical_u64(n as u64)
+    }
+
+    #[inline]
+    fn from_noncanonical_u64(n: u64) -> Self {
+        Self::from_canonical_u64(n)
+    }
 }
 
 impl PrimeField for Scalar {
