@@ -1,10 +1,10 @@
 // toy example of a circuit that checks a schnorr signatuse
 
 use log::Level;
-use plonky2::{hash::{hash_types::HashOut, hashing::{hash_n_to_hash_no_pad, hash_n_to_m_no_pad, SPONGE_WIDTH}, poseidon::{PoseidonHash, PoseidonPermutation}}, iop::{target::Target, witness::PartialWitness}, plonk::{circuit_builder::CircuitBuilder, circuit_data::{CircuitConfig, CircuitData}, config::{GenericConfig, GenericHashOut, Hasher, PoseidonGoldilocksConfig}, prover::prove}, util::timing::{self, TimingTree}};
-use plonky2_ecdsa::gadgets::{nonnative::CircuitBuilderNonNative, biguint::WitnessBigUint};
-use plonky2_ecgfp5::{curve::{scalar_field::Scalar, curve::Point}, gadgets::{curve::{CircuitBuilderEcGFp5, PartialWitnessCurve}, scalar_field::CircuitBuilderScalar, base_field::{CircuitBuilderGFp5, QuinticExtensionTarget, PartialWitnessQuinticExt}}};
-use plonky2_field::{types::{Field, Sample, PrimeField}, extension::quintic::QuinticExtension};
+use plonky2::{hash::{hashing::{hash_n_to_m_no_pad}, poseidon::{PoseidonHash, PoseidonPermutation}}, iop::{target::Target, witness::PartialWitness}, plonk::{circuit_builder::CircuitBuilder, circuit_data::{CircuitConfig, CircuitData}, config::{GenericConfig, GenericHashOut, PoseidonGoldilocksConfig}, prover::prove}, util::timing::{TimingTree}};
+use plonky2_ecdsa::gadgets::{nonnative::CircuitBuilderNonNative};
+use plonky2_ecgfp5::{curve::{scalar_field::Scalar, curve::Point}, gadgets::{curve::{CircuitBuilderEcGFp5}, base_field::{CircuitBuilderGFp5, QuinticExtensionTarget}}};
+use plonky2_field::{types::{Field, Sample}, extension::quintic::QuinticExtension};
 use rand::{thread_rng, Rng};
 use env_logger::{try_init_from_env, Env, DEFAULT_FILTER_ENV};
 
