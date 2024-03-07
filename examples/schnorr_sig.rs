@@ -1,11 +1,11 @@
 // toy example of a circuit that checks a schnorr signatuse
 
 use log::Level;
-use plonky2::{hash::{hashing::{hash_n_to_m_no_pad}, poseidon::{PoseidonHash, PoseidonPermutation}}, iop::{target::Target, witness::PartialWitness}, plonk::{circuit_builder::CircuitBuilder, circuit_data::{CircuitConfig, CircuitData}, config::{GenericConfig, GenericHashOut, PoseidonGoldilocksConfig}, prover::prove}, util::timing::{TimingTree}};
+use plonky2::{hash::{hashing::{hash_n_to_m_no_pad}, poseidon::{PoseidonHash, PoseidonPermutation}}, iop::{target::Target, witness::PartialWitness}, plonk::{circuit_builder::CircuitBuilder, circuit_data::{CircuitConfig, CircuitData}, config::{GenericConfig, PoseidonGoldilocksConfig}, prover::prove}, util::timing::{TimingTree}};
 use plonky2_ecdsa::gadgets::{nonnative::CircuitBuilderNonNative};
 use plonky2_ecgfp5::{curve::{scalar_field::Scalar, curve::Point}, gadgets::{curve::{CircuitBuilderEcGFp5}, base_field::{CircuitBuilderGFp5, QuinticExtensionTarget}}};
 use plonky2_field::{types::{Field, Sample}, extension::quintic::QuinticExtension};
-use rand::{thread_rng, Rng};
+use rand::thread_rng;
 use env_logger::{try_init_from_env, Env, DEFAULT_FILTER_ENV};
 
 

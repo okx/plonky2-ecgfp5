@@ -19,7 +19,6 @@ use crate::curve::scalar_field::Scalar;
 use crate::curve::{GFp, GFp5};
 use crate::gates::gfp5_mul::MulGFp5Gate;
 
-const SIX: GFp = GoldilocksField(6);
 const THREE: GFp = GoldilocksField(3);
 
 #[derive(Copy, Clone, Eq, PartialEq, Hash, Debug)]
