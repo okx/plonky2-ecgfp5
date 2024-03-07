@@ -24,7 +24,7 @@ pub struct Point {
     // Internally, we use the (x,u) fractional coordinates: for curve
     // point (x,y), we have (x,u) = (x,x/y) = (X/Z,U/T) (for the neutral
     // N, the u coordinate is 0).
-    x: GFp5,
+    pub x: GFp5,
     z: GFp5,
     u: GFp5,
     t: GFp5,
@@ -215,7 +215,11 @@ impl Point {
             GFp::ZERO,
         ]),
     };
-
+    
+    pub fn is_x_zero(&self) -> bool {
+        self.x == GFp5::ZERO
+    }
+    
     /// Encode this point into a field element. Encoding is always
     /// canonical.
     pub fn encode(self) -> GFp5 {

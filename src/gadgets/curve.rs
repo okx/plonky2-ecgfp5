@@ -10,14 +10,12 @@ use plonky2::plonk::circuit_builder::CircuitBuilder;
 use plonky2_ecdsa::gadgets::nonnative::NonNativeTarget;
 use plonky2_ecdsa::gadgets::split_nonnative::CircuitBuilderSplit;
 use plonky2_field::extension::Extendable;
-use plonky2_field::extension::quintic::QuinticExtension;
-use plonky2_field::goldilocks_field::GoldilocksField;
 
 use super::base_field::PartialWitnessQuinticExt;
 
 #[derive(Copy, Clone, Debug)]
 #[repr(transparent)]
-pub struct CurveTarget(([QuinticExtensionTarget; 2], BoolTarget));
+pub struct CurveTarget(pub([QuinticExtensionTarget; 2], BoolTarget));
 
 pub trait CircuitBuilderEcGFp5 {
     fn add_virtual_curve_target(&mut self) -> CurveTarget;
@@ -44,11 +42,20 @@ pub trait CircuitBuilderEcGFp5 {
     fn curve_decode_from_quintic_ext(&mut self, w: QuinticExtensionTarget) -> CurveTarget;
 
     fn curve_muladd_2(&mut self, a: CurveTarget, b: CurveTarget, scalar_a: &NonNativeTarget<Scalar>, scalar_b: &NonNativeTarget<Scalar>) -> CurveTarget;
+
+    fn curve_assert_not_zero(&mut self, point: CurveTarget);
 }
 
 macro_rules! impl_circuit_builder_for_extension_degree {
     ($degree:literal) => {
         impl CircuitBuilderEcGFp5 for CircuitBuilder<GFp, $degree> {
+            fn curve_assert_not_zero(&mut self, point: CurveTarget) {
+                let zero_point = self.curve_zero();
+                let is_equal = self.curve_eq(point, zero_point);
+                let zero = self.zero();
+                self.connect(is_equal.target, zero);
+            }
+
             fn add_virtual_curve_target(&mut self) -> CurveTarget {
                 let x = self.add_virtual_quintic_ext_target();
                 let y = self.add_virtual_quintic_ext_target();
@@ -148,8 +155,7 @@ macro_rules! impl_circuit_builder_for_extension_degree {
 
                 let lambda_0_if_x_not_same = self.sub_quintic_ext(y2, y1);
 
-                let mut lambda_0_if_x_same = self.square_quintic_ext(x1);
-                lambda_0_if_x_same = self.triple_quintic_ext(lambda_0_if_x_same);
+                let mut lambda_0_if_x_same = self.weighted_mul_quintic_ext(GFp::from_canonical_u8(3), x1, x1);
                 lambda_0_if_x_same =
                     self.add_const_quintic_ext(lambda_0_if_x_same, WeierstrassPoint::A);
 
@@ -197,8 +203,7 @@ macro_rules! impl_circuit_builder_for_extension_degree {
             fn curve_double(&mut self, a: CurveTarget) -> CurveTarget {
                 let CurveTarget(([x, y], is_inf)) = a;
 
-                let mut lambda_0 = self.square_quintic_ext(x);
-                lambda_0 = self.triple_quintic_ext(lambda_0);
+                let mut lambda_0 = self.weighted_mul_quintic_ext(GFp::from_canonical_u8(3), x, x);
                 lambda_0 = self.add_const_quintic_ext(lambda_0, WeierstrassPoint::A);
                 let lambda_1 = self.double_quintic_ext(y);
 
