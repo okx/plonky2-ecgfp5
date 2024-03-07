@@ -18,10 +18,10 @@ use plonky2::{
     util::timing::{self, TimingTree},
 };
 use plonky2_ecdsa::gadgets::{
-    biguint::WitnessBigUint, curve::CircuitBuilderCurve, nonnative::CircuitBuilderNonNative,
+    biguint::WitnessBigUint, curve::{AffinePointTarget, CircuitBuilderCurve}, nonnative::CircuitBuilderNonNative,
 };
 use plonky2_ecgfp5::{
-    curve::{curve::Point, scalar_field::Scalar},
+    curve::{curve::{Point, WeierstrassPoint}, scalar_field::Scalar},
     gadgets::{
         base_field::{CircuitBuilderGFp5, PartialWitnessQuinticExt, QuinticExtensionTarget},
         curve::{CircuitBuilderEcGFp5, CurveTarget, PartialWitnessCurve},
@@ -42,13 +42,13 @@ pub const SPONGE_RATE: usize = 8;
 
 // we define a hash function whose digest is 5 GFp5 elems
 // note: this doesn't apply any padding, so this is vulnerable to length extension attacks
-fn sig_hash(message: &[F]) -> [F; 5] {
-    let mut res = [F::ZERO; 5];
-    let out = hash_n_to_m_no_pad::<F, PoseidonPermutation>(message, 5);
-    res.copy_from_slice(&out[..5]);
+// fn sig_hash(message: &[F]) -> [F; 5] {
+//     let mut res = [F::ZERO; 5];
+//     let out = hash_n_to_m_no_pad::<F, PoseidonPermutation>(message, 5);
+//     res.copy_from_slice(&out[..5]);
 
-    res
-}
+//     res
+// }
 
 pub fn main() {
     init_logger();
@@ -86,13 +86,20 @@ pub fn main() {
     // 6. s = k^{-1} * (z + r*sk) mod n
     let s = k.inverse() * (z + r * sk);
 
+    /* Verify in Rust */
+    {
+        let u1 = z * s.inverse();
+        let u2 = r * s.inverse();
+        let point = u1 * Point::GENERATOR + u2 * pk;
+        assert_eq!(r, Scalar::from_gfp5(point.x));
+        assert_eq!(point.is_neutral(), false);
+    }
+
     /* Verify in circuit */
     let config = CircuitConfig::wide_ecc_config();
     let mut builder = CircuitBuilder::<F, D>::new(config);
 
-    // Verify(meg_z, (r,s), pk)
-    // let msg_target = builder.constant_quintic_ext(QuinticExtension(e));
-    let msg_z_target = builder.constant_nonnative::<Scalar>(z);
+    // Verify(msg, (r,s), pk)
     // Sig = (r, s)
     let r_target = builder.constant_nonnative::<Scalar>(r);
     let s_target = builder.constant_nonnative::<Scalar>(s);
@@ -100,17 +107,30 @@ pub fn main() {
 
     let g = builder.curve_constant(Point::GENERATOR.to_weierstrass());
     // 1. Check pk is a valid curve point
-    // builder.curve_assert_valid(pk_target);
+    // {
+    //     let a = builder.constant_nonnative(WeierstrassPoint::A);
+    //     let b = builder.constant_nonnative(WeierstrassPoint::B);
+    //     let px = &pk_target.0.0[0];
+    //     let py = &pk_target.0.0[1];
+    //     let y_squared = builder.mul_nonnative(py, py);
+    //     let x_squared = builder.mul_nonnative(px, px);
+    //     let x_cuded = builder.mul_nonnative(&x_squared, px);
+    //     let a_x = builder.mul_nonnative(&a, px);
+    //     let a_x_plus_b = builder.add_nonnative(&a_x, &b);
+    //     let rhs = builder.add_nonnative(&x_cuded, &a_x_plus_b);
+    //     builder.connect_nonnative(&y_squared, &rhs);
+    // }
 
     // 2. Check r and s are in [1, n-1]
 
-    // We get meg_z from witness directly
     // 3. e = HASH(msg)
     // 4. z = Ln leastmost bits of e
+    // We get z from witness directly
+    let z_target = builder.constant_nonnative::<Scalar>(z);
 
     // 5. u1 = z * s^{-1} mod n, u2 = r * s^{-1} mod n
     let s_inv = builder.inv_nonnative(&s_target);
-    let u1 = builder.mul_nonnative(&msg_z_target, &s_inv);
+    let u1 = builder.mul_nonnative(&z_target, &s_inv);
     let u2 = builder.mul_nonnative(&r_target, &s_inv);
 
     // 6. (x1, y1) = u1*G + u2*pk
