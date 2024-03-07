@@ -57,7 +57,6 @@ pub fn main() {
 
 
 	// 1. message digest & encoding
-
 	let message_bytes = b"I'm going to be the king of pirates!";
 	let message_elems = message_bytes.map(|b| F::from_canonical_u8(b));
 	let m = sig_hash(&message_elems);
@@ -100,6 +99,7 @@ pub fn main() {
 	);
 
 	// e_v = H(R || m)
+	// Not compute message hash in circuit
 	let mut preimage = builder.curve_encode_to_quintic_ext(r_v).0.to_vec();
 	preimage.extend(&m.0);
 	let e_v_ext = QuinticExtensionTarget(
