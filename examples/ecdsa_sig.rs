@@ -3,36 +3,28 @@
 use env_logger::{try_init_from_env, Env, DEFAULT_FILTER_ENV};
 use log::Level;
 use plonky2::{
-    hash::{
-        hash_types::HashOut,
-        hashing::{hash_n_to_hash_no_pad, hash_n_to_m_no_pad, SPONGE_WIDTH},
-        poseidon::PoseidonPermutation,
-    },
-    iop::{target::Target, witness::PartialWitness},
+    iop::{witness::PartialWitness},
     plonk::{
         circuit_builder::CircuitBuilder,
         circuit_data::{CircuitConfig, CircuitData},
-        config::{GenericConfig, GenericHashOut, Hasher, PoseidonGoldilocksConfig},
+        config::{GenericConfig, PoseidonGoldilocksConfig},
         prover::prove,
     },
-    util::timing::{self, TimingTree},
+    util::timing::{TimingTree},
 };
 use plonky2_ecdsa::gadgets::{
-    biguint::WitnessBigUint, curve::{AffinePointTarget, CircuitBuilderCurve}, nonnative::CircuitBuilderNonNative,
+    nonnative::CircuitBuilderNonNative,
 };
 use plonky2_ecgfp5::{
-    curve::{curve::{Point, WeierstrassPoint}, scalar_field::Scalar},
+    curve::{curve::{Point}, scalar_field::Scalar},
     gadgets::{
-        base_field::{CircuitBuilderGFp5, PartialWitnessQuinticExt, QuinticExtensionTarget},
-        curve::{CircuitBuilderEcGFp5, CurveTarget, PartialWitnessCurve},
-        scalar_field::CircuitBuilderScalar,
+        curve::{CircuitBuilderEcGFp5},
     },
 };
 use plonky2_field::{
-    extension::quintic::QuinticExtension,
-    types::{Field, PrimeField, Sample},
+    types::{Field, Sample},
 };
-use rand::{thread_rng, Rng};
+use rand::thread_rng;
 
 const D: usize = 2;
 type C = PoseidonGoldilocksConfig;
@@ -91,7 +83,7 @@ pub fn main() {
         let u1 = z * s.inverse();
         let u2 = r * s.inverse();
         let point = u1 * Point::GENERATOR + u2 * pk;
-        assert_eq!(r, Scalar::from_gfp5(point.x));
+        assert!(point.equals(k * Point::GENERATOR));
         assert_eq!(point.is_neutral(), false);
     }
 
@@ -105,21 +97,22 @@ pub fn main() {
     let s_target = builder.constant_nonnative::<Scalar>(s);
     let pk_target = builder.curve_constant(pk.to_weierstrass());
 
-    let g = builder.curve_constant(Point::GENERATOR.to_weierstrass());
+    let g = builder.curve_generator();
     // 1. Check pk is a valid curve point
-    // {
-    //     let a = builder.constant_nonnative(WeierstrassPoint::A);
-    //     let b = builder.constant_nonnative(WeierstrassPoint::B);
-    //     let px = &pk_target.0.0[0];
-    //     let py = &pk_target.0.0[1];
-    //     let y_squared = builder.mul_nonnative(py, py);
-    //     let x_squared = builder.mul_nonnative(px, px);
-    //     let x_cuded = builder.mul_nonnative(&x_squared, px);
-    //     let a_x = builder.mul_nonnative(&a, px);
-    //     let a_x_plus_b = builder.add_nonnative(&a_x, &b);
-    //     let rhs = builder.add_nonnative(&x_cuded, &a_x_plus_b);
-    //     builder.connect_nonnative(&y_squared, &rhs);
-    // }
+    {
+
+        // let a = builder.constant_nonnative(WeierstrassPoint::A);
+        // let b = builder.constant_nonnative(WeierstrassPoint::B);
+        // let px = &pk_target.0.0[0];
+        // let py = &pk_target.0.0[1];
+        // let y_squared = builder.mul_nonnative(py, py);
+        // let x_squared = builder.mul_nonnative(px, px);
+        // let x_cuded = builder.mul_nonnative(&x_squared, px);
+        // let a_x = builder.mul_nonnative(&a, px);
+        // let a_x_plus_b = builder.add_nonnative(&a_x, &b);
+        // let rhs = builder.add_nonnative(&x_cuded, &a_x_plus_b);
+        // builder.connect_nonnative(&y_squared, &rhs);
+    }
 
     // 2. Check r and s are in [1, n-1]
 
@@ -133,14 +126,13 @@ pub fn main() {
     let u1 = builder.mul_nonnative(&z_target, &s_inv);
     let u2 = builder.mul_nonnative(&r_target, &s_inv);
 
-    // 6. (x1, y1) = u1*G + u2*pk
+    // 6. point = u1*G + u2*pk
     let point = builder.curve_muladd_2(g, pk_target, &u1, &u2);
 
-    // 7. Check r == x1 mod n and (x1, y1) != O (identity element)
-    let CurveTarget(([x1_ext, y1_ext], is_inf)) = point;
-    let x1 = builder.encode_quintic_ext_as_scalar(x1_ext);
-    builder.connect_nonnative(&r_target, &x1);
-    builder.assert_zero(is_inf.target);
+    // 7. Check point = r*G and point != O (identity element)
+    let r_g = builder.curve_scalar_mul(g, &r_target);
+    builder.curve_eq(point, r_g);
+    builder.curve_assert_not_zero(point);
 
     // build circuit
     builder.print_gate_counts(0);

@@ -42,11 +42,20 @@ pub trait CircuitBuilderEcGFp5 {
     fn curve_decode_from_quintic_ext(&mut self, w: QuinticExtensionTarget) -> CurveTarget;
 
     fn curve_muladd_2(&mut self, a: CurveTarget, b: CurveTarget, scalar_a: &NonNativeTarget<Scalar>, scalar_b: &NonNativeTarget<Scalar>) -> CurveTarget;
+
+    fn curve_assert_not_zero(&mut self, point: CurveTarget);
 }
 
 macro_rules! impl_circuit_builder_for_extension_degree {
     ($degree:literal) => {
         impl CircuitBuilderEcGFp5 for CircuitBuilder<GFp, $degree> {
+            fn curve_assert_not_zero(&mut self, point: CurveTarget) {
+                let zero_point = self.curve_zero();
+                let is_equal = self.curve_eq(point, zero_point);
+                let zero = self.zero();
+                self.connect(is_equal.target, zero);
+            }
+
             fn add_virtual_curve_target(&mut self) -> CurveTarget {
                 let x = self.add_virtual_quintic_ext_target();
                 let y = self.add_virtual_quintic_ext_target();
