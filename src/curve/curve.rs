@@ -136,8 +136,9 @@ impl Eq for WeierstrassPoint {}
 
 impl Sample for Point {
     fn sample<R>(rng: &mut R) -> Self
-        where
-            R: RngCore + ?Sized {
+    where
+        R: RngCore + ?Sized,
+    {
         let s = Scalar::sample(rng);
         Point::GENERATOR * s
     }
@@ -145,7 +146,8 @@ impl Sample for Point {
 
 impl Point {
     // Curve equation 'a' constant.
-    pub(crate) const A: GFp5 = QuinticExtension([GFp::TWO, GFp::ZERO, GFp::ZERO, GFp::ZERO, GFp::ZERO]);
+    pub(crate) const A: GFp5 =
+        QuinticExtension([GFp::TWO, GFp::ZERO, GFp::ZERO, GFp::ZERO, GFp::ZERO]);
     pub const B1: u64 = 263;
 
     pub(crate) const B: GFp5 = QuinticExtension([
@@ -181,7 +183,6 @@ impl Point {
         GFp::ZERO,
     ]);
 
-
     /// The neutral point (neutral of the group law).
     pub const NEUTRAL: Self = Self {
         x: GFp5::ZERO,
@@ -215,11 +216,11 @@ impl Point {
             GFp::ZERO,
         ]),
     };
-    
+
     pub fn is_x_zero(&self) -> bool {
         self.x == GFp5::ZERO
     }
-    
+
     /// Encode this point into a field element. Encoding is always
     /// canonical.
     pub fn encode(self) -> GFp5 {
@@ -1202,11 +1203,13 @@ impl Eq for Point {}
 #[cfg(test)]
 mod tests {
     use plonky2_field::{
-        extension::quintic::QuinticExtension, goldilocks_field::GoldilocksField, types::{Field, Sample},
+        extension::quintic::QuinticExtension,
+        goldilocks_field::GoldilocksField,
+        types::{Field, Sample},
     };
     use rand::{thread_rng, Rng};
 
-    use crate::curve::{base_field::InverseOrZero, scalar_field::Scalar, GFp5, GFp};
+    use crate::curve::{base_field::InverseOrZero, scalar_field::Scalar, GFp, GFp5};
 
     use super::{AffinePoint, Point, WeierstrassPoint};
 
@@ -1277,7 +1280,6 @@ mod tests {
     #[test]
     fn test_basic_ops() {
         let [w0, w1, w2, w3, w4, w5, w6, w7] = test_vectors();
-
 
         // Values that should not decode successfully.
         let bww: [GFp5; 6] = [
@@ -1598,7 +1600,6 @@ mod tests {
         };
         let p5 = WeierstrassPoint::decode(w5).expect("w5 should successfully decode");
         assert_eq!(p5, p5_expected);
-
 
         let p6_expected = WeierstrassPoint {
             x: QuinticExtension([

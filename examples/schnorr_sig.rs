@@ -13,7 +13,9 @@ use plonky2::{
     util::timing::TimingTree,
 };
 
-use plonky2_ecgfp5::gadgets::schnorr::{schnorr_keygen, schnorr_sign, schnorr_verify_circuit, verify_rust};
+use plonky2_ecgfp5::gadgets::schnorr::{
+    schnorr_keygen, schnorr_sign, schnorr_verify_circuit, verify_rust,
+};
 use plonky2_field::types::Field;
 use rand::thread_rng;
 
@@ -26,14 +28,14 @@ pub const SPONGE_RATE: usize = 8;
 pub fn main() {
     init_logger();
 
-	// Keygen
+    // Keygen
     let mut rng = thread_rng();
     let (pk, sk) = schnorr_keygen(&mut rng);
-	// Sign
+    // Sign
     let message = b"Hello, world!";
     let message_f = message.map(|b| F::from_canonical_u8(b));
     let sig = schnorr_sign(&message_f, &sk, &mut rng);
-	// Verify in Rust
+    // Verify in Rust
     assert!(verify_rust(&message_f, &pk, &sig));
 
     // Verify in circuit

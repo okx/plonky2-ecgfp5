@@ -8,10 +8,10 @@ use plonky2::iop::generator::{GeneratedValues, SimpleGenerator};
 use plonky2::iop::target::{BoolTarget, Target};
 use plonky2::iop::witness::{PartitionWitness, Witness, WitnessWrite};
 use plonky2::plonk::circuit_builder::CircuitBuilder;
-use plonky2_field::extension::{Extendable, FieldExtension};
-use plonky2_field::types::Field;
 use plonky2_ecdsa::gadgets::biguint::BigUintTarget;
 use plonky2_ecdsa::gadgets::nonnative::CircuitBuilderNonNative;
+use plonky2_field::extension::{Extendable, FieldExtension};
+use plonky2_field::types::Field;
 use plonky2_u32::gadgets::arithmetic_u32::U32Target;
 
 use crate::curve::base_field::SquareRoot;
@@ -142,7 +142,7 @@ pub trait CircuitBuilderGFp5<F: RichField + Extendable<5>> {
 
     fn encode_quintic_ext_as_scalar(
         &mut self,
-        x: QuinticExtensionTarget
+        x: QuinticExtensionTarget,
     ) -> NonNativeTarget<Scalar>;
 }
 
@@ -202,7 +202,6 @@ impl<W: Witness<F>, F: RichField + Extendable<5>> PartialWitnessQuinticExt<F> fo
         self.set_target(t3, v3);
         self.set_target(t4, v4);
     }
-
 }
 
 macro_rules! impl_circuit_builder_for_extension_degree {
@@ -338,10 +337,7 @@ macro_rules! impl_circuit_builder_for_extension_degree {
                 ])
             }
 
-            fn double_quintic_ext(
-                &mut self,
-                a: QuinticExtensionTarget,
-            ) -> QuinticExtensionTarget {
+            fn double_quintic_ext(&mut self, a: QuinticExtensionTarget) -> QuinticExtensionTarget {
                 let QuinticExtensionTarget([a0, a1, a2, a3, a4]) = a;
                 QuinticExtensionTarget::new([
                     self.mul_const(GFp::TWO, a0),
@@ -352,10 +348,7 @@ macro_rules! impl_circuit_builder_for_extension_degree {
                 ])
             }
 
-            fn triple_quintic_ext(
-                &mut self,
-                a: QuinticExtensionTarget,
-            ) -> QuinticExtensionTarget {
+            fn triple_quintic_ext(&mut self, a: QuinticExtensionTarget) -> QuinticExtensionTarget {
                 let QuinticExtensionTarget([a0, a1, a2, a3, a4]) = a;
                 QuinticExtensionTarget::new([
                     self.mul_const(THREE, a0),
@@ -426,14 +419,23 @@ macro_rules! impl_circuit_builder_for_extension_degree {
                 let constants = &[c];
                 let (gate, i) = self.find_slot(gate, constants, constants);
 
-                let multiplicand_0_wires = MulGFp5Gate::wires_ith_multiplicand_0(i).map(|wire| Target::wire(gate, wire));
-                let multiplicand_1_wires = MulGFp5Gate::wires_ith_multiplicand_1(i).map(|wire| Target::wire(gate, wire));
+                let multiplicand_0_wires =
+                    MulGFp5Gate::wires_ith_multiplicand_0(i).map(|wire| Target::wire(gate, wire));
+                let multiplicand_1_wires =
+                    MulGFp5Gate::wires_ith_multiplicand_1(i).map(|wire| Target::wire(gate, wire));
 
-                a.0.into_iter().zip(multiplicand_0_wires).for_each(|(a, wire)| self.connect(a, wire));
-                b.0.into_iter().zip(multiplicand_1_wires).for_each(|(b, wire)| self.connect(b, wire));
+                a.0.into_iter()
+                    .zip(multiplicand_0_wires)
+                    .for_each(|(a, wire)| self.connect(a, wire));
+                b.0.into_iter()
+                    .zip(multiplicand_1_wires)
+                    .for_each(|(b, wire)| self.connect(b, wire));
 
-
-                let output_limbs: [Target; 5] = MulGFp5Gate::wires_ith_output(i).map(|wire| Target::wire(gate, wire)).collect::<Vec<_>>().try_into().unwrap();
+                let output_limbs: [Target; 5] = MulGFp5Gate::wires_ith_output(i)
+                    .map(|wire| Target::wire(gate, wire))
+                    .collect::<Vec<_>>()
+                    .try_into()
+                    .unwrap();
                 QuinticExtensionTarget::new(output_limbs)
             }
 
@@ -478,7 +480,7 @@ macro_rules! impl_circuit_builder_for_extension_degree {
 
                 let quotient_times_denominator = self.mul_quintic_ext(quotient, b);
                 let zero_if_prod_is_a = self.sub_quintic_ext(quotient_times_denominator, a);
-                
+
                 // check zero
                 // we can do the multiplication limb-wise here, as their product is zero
                 // iff one of them is all zeros
@@ -704,10 +706,11 @@ macro_rules! impl_circuit_builder_for_extension_degree {
                     self.split_le_base::<2>(c2, 64),
                     self.split_le_base::<2>(c3, 64),
                     self.split_le_base::<2>(c4, 64),
-                ].concat();
+                ]
+                .concat();
 
-                let limbs_u32 = bits.
-                    chunks(32)
+                let limbs_u32 = bits
+                    .chunks(32)
                     .map(|chunk| {
                         let mut terms = vec![];
                         for (i, term) in chunk.iter().enumerate() {
@@ -715,8 +718,9 @@ macro_rules! impl_circuit_builder_for_extension_degree {
                         }
 
                         U32Target(self.add_many(terms))
-                    }).collect::<Vec<_>>();
-                
+                    })
+                    .collect::<Vec<_>>();
+
                 let biguint = BigUintTarget { limbs: limbs_u32 };
                 self.reduce::<Scalar>(&biguint)
             }
@@ -1125,7 +1129,7 @@ mod tests {
         builder.register_public_input(legendre_sym);
 
         let circuit = builder.build::<C>();
-        
+
         let mut pw = PartialWitness::new();
         pw.set_target(legendre_sym, GFp::ONE);
 
@@ -1134,7 +1138,7 @@ mod tests {
 
         // legendre sym == -1
         let mut builder = CircuitBuilder::<F, D>::new(config.clone());
-        
+
         let non_square = gfp5_random_non_square();
         let non_square = builder.constant_quintic_ext(non_square);
         let legendre_sym = builder.legendre_sym_quintic_ext(non_square);
@@ -1178,10 +1182,9 @@ mod tests {
         let x = GFp5::sample(&mut rng);
 
         let QuinticExtension(limbs) = x;
-        let encoded_expected = Scalar::from_noncanonical_biguint(
-            biguint_from_array(limbs.map(|l| l.to_canonical_u64()))
-        );
-
+        let encoded_expected = Scalar::from_noncanonical_biguint(biguint_from_array(
+            limbs.map(|l| l.to_canonical_u64()),
+        ));
 
         let x = builder.constant_quintic_ext(x);
         let encoded = builder.encode_quintic_ext_as_scalar(x);

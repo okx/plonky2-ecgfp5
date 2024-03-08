@@ -3,27 +3,21 @@
 use env_logger::{try_init_from_env, Env, DEFAULT_FILTER_ENV};
 use log::Level;
 use plonky2::{
-    iop::{witness::PartialWitness},
+    iop::witness::PartialWitness,
     plonk::{
         circuit_builder::CircuitBuilder,
         circuit_data::{CircuitConfig, CircuitData},
         config::{GenericConfig, PoseidonGoldilocksConfig},
         prover::prove,
     },
-    util::timing::{TimingTree},
+    util::timing::TimingTree,
 };
-use plonky2_ecdsa::gadgets::{
-    nonnative::CircuitBuilderNonNative,
-};
+use plonky2_ecdsa::gadgets::nonnative::CircuitBuilderNonNative;
 use plonky2_ecgfp5::{
-    curve::{curve::{Point}, scalar_field::Scalar},
-    gadgets::{
-        curve::{CircuitBuilderEcGFp5},
-    },
+    curve::{curve::Point, scalar_field::Scalar},
+    gadgets::curve::CircuitBuilderEcGFp5,
 };
-use plonky2_field::{
-    types::{Field, Sample},
-};
+use plonky2_field::types::{Field, Sample};
 use rand::thread_rng;
 
 const D: usize = 2;
