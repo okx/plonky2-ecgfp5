@@ -834,7 +834,6 @@ impl SimpleGenerator<GFp> for QuinticSqrtGenerator {
 #[cfg(test)]
 mod tests {
     use anyhow::Result;
-    use num::BigUint;
     use plonky2::field::types::{Field, Sample};
     use plonky2::iop::witness::PartialWitness;
     use plonky2::plonk::circuit_builder::CircuitBuilder;
