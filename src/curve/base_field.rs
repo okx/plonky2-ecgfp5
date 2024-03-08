@@ -124,7 +124,7 @@ mod tests {
     use rand::thread_rng;
 
     use crate::curve::test_utils::gfp5_random_non_square;
-
+    use crate::curve::base_field::SquareRoot;
     use super::*;
 
     #[test]
@@ -163,7 +163,7 @@ mod tests {
         for _ in 0..30 {
             let x = GFp5::sample(&mut rng);
             let square = x * x;
-            let sqrt = square.sqrt().unwrap();
+            let sqrt = SquareRoot::sqrt(&square).unwrap();
 
             assert_eq!(sqrt * sqrt, square);
         }
