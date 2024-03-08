@@ -35,3 +35,7 @@ harness = false
 [[bench]]
 name = "curve"
 harness = false
+
+[[bench]]
+name = "schnorr"
+harness = false

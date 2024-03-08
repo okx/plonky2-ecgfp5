@@ -37,13 +37,13 @@ pub struct SchnorrSignature {
     pub(crate) e: Scalar,
 }
 
-pub fn keygen(rng: &mut dyn RngCore) -> (SchnorrPublicKey, SchnorrSecretKey) {
+pub fn schnorr_keygen(rng: &mut dyn RngCore) -> (SchnorrPublicKey, SchnorrSecretKey) {
     let sk = Scalar::sample(rng);
     let pk = Point::GENERATOR * sk;
     (SchnorrPublicKey(pk), SchnorrSecretKey(sk))
 }
 
-pub fn sign(
+pub fn schnorr_sign(
     message: &[GoldilocksField],
     sk: &SchnorrSecretKey,
     rng: &mut dyn RngCore,
@@ -77,7 +77,7 @@ pub fn verify_rust(
     e == sig.e
 }
 
-pub fn verify_circuit(
+pub fn schnorr_verify_circuit(
     builder: &mut CircuitBuilder<F, D>,
     message: &[GoldilocksField],
     pk: &SchnorrPublicKey,
@@ -131,10 +131,10 @@ mod tests {
     #[test]
     fn test_verify_rust() {
         let mut rng = thread_rng();
-        let (pk, sk) = keygen(&mut rng);
+        let (pk, sk) = schnorr_keygen(&mut rng);
         let message = b"Hello, world!";
         let message_f = message.map(|b| F::from_canonical_u8(b));
-        let sig = sign(&message_f, &sk, &mut rng);
+        let sig = schnorr_sign(&message_f, &sk, &mut rng);
         assert!(verify_rust(&message_f, &pk, &sig));
     }
 
@@ -142,15 +142,15 @@ mod tests {
     fn test_verify_circuit() {
         // keygen and sign
         let mut rng = thread_rng();
-        let (pk, sk) = keygen(&mut rng);
+        let (pk, sk) = schnorr_keygen(&mut rng);
         let message = b"Hello, world!";
         let message_f = message.map(|b| F::from_canonical_u8(b));
-        let sig = sign(&message_f, &sk, &mut rng);
+        let sig = schnorr_sign(&message_f, &sk, &mut rng);
 
         // Verify in circuit
         let config = CircuitConfig::standard_recursion_config();
         let mut builder = CircuitBuilder::<F, D>::new(config);
-        verify_circuit(&mut builder, &message_f, &pk, &sig);
+        schnorr_verify_circuit(&mut builder, &message_f, &pk, &sig);
         // build circuit
         builder.print_gate_counts(0);
         let pw = PartialWitness::new();
