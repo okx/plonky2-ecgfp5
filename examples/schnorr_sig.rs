@@ -14,7 +14,7 @@ use plonky2::{
 };
 
 use plonky2_ecgfp5::gadgets::schnorr::{
-    schnorr_keygen, schnorr_sign, schnorr_verify_circuit, verify_rust,
+    schnorr_keygen, schnorr_sign, schnorr_verify_circuit, schnorr_verify_rust,
 };
 use plonky2_field::types::Field;
 use rand::thread_rng;
@@ -36,7 +36,7 @@ pub fn main() {
     let message_f = message.map(|b| F::from_canonical_u8(b));
     let sig = schnorr_sign(&message_f, &sk, &mut rng);
     // Verify in Rust
-    assert!(verify_rust(&message_f, &pk, &sig));
+    assert!(schnorr_verify_rust(&message_f, &pk, &sig));
 
     // Verify in circuit
     let config = CircuitConfig::standard_recursion_config();

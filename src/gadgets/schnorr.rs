@@ -64,7 +64,7 @@ pub fn schnorr_sign(
     SchnorrSignature { s, e }
 }
 
-pub fn verify_rust(
+pub fn schnorr_verify_rust(
     message: &[GoldilocksField],
     pk: &SchnorrPublicKey,
     sig: &SchnorrSignature,
@@ -135,7 +135,7 @@ mod tests {
         let message = b"Hello, world!";
         let message_f = message.map(|b| F::from_canonical_u8(b));
         let sig = schnorr_sign(&message_f, &sk, &mut rng);
-        assert!(verify_rust(&message_f, &pk, &sig));
+        assert!(schnorr_verify_rust(&message_f, &pk, &sig));
     }
 
     #[test]
