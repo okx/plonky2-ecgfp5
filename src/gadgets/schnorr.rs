@@ -1,3 +1,5 @@
+#![allow(dead_code)]
+
 use crate::curve::curve::Point;
 use crate::curve::scalar_field::Scalar;
 use crate::gadgets::curve::CircuitBuilderEcGFp5;
