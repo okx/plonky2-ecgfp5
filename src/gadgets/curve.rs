@@ -404,10 +404,10 @@ macro_rules! impl_circuit_builder_for_extension_degree {
     };
 }
 
-impl_circuit_builder_for_extension_degree!(1);
+// impl_circuit_builder_for_extension_degree!(1);
 impl_circuit_builder_for_extension_degree!(2);
-impl_circuit_builder_for_extension_degree!(4);
-impl_circuit_builder_for_extension_degree!(5);
+// impl_circuit_builder_for_extension_degree!(4);
+// impl_circuit_builder_for_extension_degree!(5);
 
 pub trait PartialWitnessCurve<F: RichField + Extendable<5>>: Witness<F> {
     fn get_curve_target(&self, target: CurveTarget) -> WeierstrassPoint;

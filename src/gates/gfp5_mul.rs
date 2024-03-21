@@ -67,12 +67,20 @@ impl<F: RichField + Extendable<D>, const D: usize> Gate<F, D> for MulGFp5Gate {
     fn export_solidity_verification_code(&self) -> String {
         todo!();
     }
-    fn serialize(&self, dst: &mut Vec<u8>, common_data: &plonky2::plonk::circuit_data::CommonCircuitData<F, D>) -> plonky2::util::serialization::IoResult<()> {
+    fn serialize(
+        &self,
+        _dst: &mut Vec<u8>,
+        _common_data: &plonky2::plonk::circuit_data::CommonCircuitData<F, D>,
+    ) -> plonky2::util::serialization::IoResult<()> {
         todo!();
     }
-    fn deserialize(src: &mut plonky2::util::serialization::Buffer, common_data: &plonky2::plonk::circuit_data::CommonCircuitData<F, D>) -> plonky2::util::serialization::IoResult<Self>
-        where
-            Self: Sized {
+    fn deserialize(
+        _src: &mut plonky2::util::serialization::Buffer,
+        _common_data: &plonky2::plonk::circuit_data::CommonCircuitData<F, D>,
+    ) -> plonky2::util::serialization::IoResult<Self>
+    where
+        Self: Sized,
+    {
         todo!();
     }
     fn eval_unfiltered(&self, vars: EvaluationVars<F, D>) -> Vec<F::Extension> {
@@ -220,16 +228,26 @@ pub struct MulGFp5Generator<F: RichField + Extendable<D>, const D: usize> {
     op_idx: usize,
 }
 
-impl<F: RichField + Extendable<D>, const D: usize> SimpleGenerator<F, D> for MulGFp5Generator<F, D> {
+impl<F: RichField + Extendable<D>, const D: usize> SimpleGenerator<F, D>
+    for MulGFp5Generator<F, D>
+{
     fn id(&self) -> String {
         "MulGFp5Generator".to_string()
     }
-    fn serialize(&self, dst: &mut Vec<u8>, common_data: &plonky2::plonk::circuit_data::CommonCircuitData<F, D>) -> plonky2::util::serialization::IoResult<()> {
+    fn serialize(
+        &self,
+        _dst: &mut Vec<u8>,
+        _common_data: &plonky2::plonk::circuit_data::CommonCircuitData<F, D>,
+    ) -> plonky2::util::serialization::IoResult<()> {
         todo!();
     }
-    fn deserialize(src: &mut plonky2::util::serialization::Buffer, common_data: &plonky2::plonk::circuit_data::CommonCircuitData<F, D>) -> plonky2::util::serialization::IoResult<Self>
-        where
-            Self: Sized {
+    fn deserialize(
+        _src: &mut plonky2::util::serialization::Buffer,
+        _common_data: &plonky2::plonk::circuit_data::CommonCircuitData<F, D>,
+    ) -> plonky2::util::serialization::IoResult<Self>
+    where
+        Self: Sized,
+    {
         todo!();
     }
     fn dependencies(&self) -> Vec<Target> {
