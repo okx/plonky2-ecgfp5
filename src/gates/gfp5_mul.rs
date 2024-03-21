@@ -6,7 +6,7 @@ use plonky2::{
     hash::hash_types::RichField,
     iop::{
         ext_target::ExtensionTarget,
-        generator::{GeneratedValues, SimpleGenerator, WitnessGenerator},
+        generator::{GeneratedValues, SimpleGenerator, WitnessGenerator, WitnessGeneratorRef},
         target::Target,
         witness::{PartitionWitness, Witness, WitnessWrite},
     },
@@ -61,7 +61,20 @@ impl<F: RichField + Extendable<D>, const D: usize> Gate<F, D> for MulGFp5Gate {
     fn id(&self) -> String {
         format!("{self:?}")
     }
-
+    fn export_circom_verification_code(&self) -> String {
+        todo!();
+    }
+    fn export_solidity_verification_code(&self) -> String {
+        todo!();
+    }
+    fn serialize(&self, dst: &mut Vec<u8>, common_data: &plonky2::plonk::circuit_data::CommonCircuitData<F, D>) -> plonky2::util::serialization::IoResult<()> {
+        todo!();
+    }
+    fn deserialize(src: &mut plonky2::util::serialization::Buffer, common_data: &plonky2::plonk::circuit_data::CommonCircuitData<F, D>) -> plonky2::util::serialization::IoResult<Self>
+        where
+            Self: Sized {
+        todo!();
+    }
     fn eval_unfiltered(&self, vars: EvaluationVars<F, D>) -> Vec<F::Extension> {
         let c = vars.local_constants[0];
 
@@ -167,10 +180,10 @@ impl<F: RichField + Extendable<D>, const D: usize> Gate<F, D> for MulGFp5Gate {
         constraints
     }
 
-    fn generators(&self, row: usize, local_constants: &[F]) -> Vec<Box<dyn WitnessGenerator<F>>> {
+    fn generators(&self, row: usize, local_constants: &[F]) -> Vec<WitnessGeneratorRef<F, D>> {
         (0..self.num_ops)
             .map(|op_idx| {
-                let g: Box<dyn WitnessGenerator<F>> = Box::new(
+                let g: Box<dyn WitnessGenerator<F, D>> = Box::new(
                     MulGFp5Generator {
                         row,
                         c: local_constants[0],
@@ -178,7 +191,7 @@ impl<F: RichField + Extendable<D>, const D: usize> Gate<F, D> for MulGFp5Gate {
                     }
                     .adapter(),
                 );
-                g
+                WitnessGeneratorRef(g)
             })
             .collect()
     }
@@ -207,7 +220,18 @@ pub struct MulGFp5Generator<F: RichField + Extendable<D>, const D: usize> {
     op_idx: usize,
 }
 
-impl<F: RichField + Extendable<D>, const D: usize> SimpleGenerator<F> for MulGFp5Generator<F, D> {
+impl<F: RichField + Extendable<D>, const D: usize> SimpleGenerator<F, D> for MulGFp5Generator<F, D> {
+    fn id(&self) -> String {
+        "MulGFp5Generator".to_string()
+    }
+    fn serialize(&self, dst: &mut Vec<u8>, common_data: &plonky2::plonk::circuit_data::CommonCircuitData<F, D>) -> plonky2::util::serialization::IoResult<()> {
+        todo!();
+    }
+    fn deserialize(src: &mut plonky2::util::serialization::Buffer, common_data: &plonky2::plonk::circuit_data::CommonCircuitData<F, D>) -> plonky2::util::serialization::IoResult<Self>
+        where
+            Self: Sized {
+        todo!();
+    }
     fn dependencies(&self) -> Vec<Target> {
         MulGFp5Gate::wires_ith_multiplicand_0(self.op_idx)
             .chain(MulGFp5Gate::wires_ith_multiplicand_1(self.op_idx))

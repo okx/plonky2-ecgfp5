@@ -110,7 +110,7 @@ pub fn schnorr_verify_circuit(
 /// note: this doesn't apply any padding, so this is vulnerable to length extension attacks
 fn hash(message: &[F]) -> [F; 5] {
     let mut res = [F::ZERO; 5];
-    let out = hash_n_to_m_no_pad::<F, PoseidonPermutation>(message, 5);
+    let out = hash_n_to_m_no_pad::<F, PoseidonPermutation<F>>(message, 5);
     res.copy_from_slice(&out[..5]);
 
     res
