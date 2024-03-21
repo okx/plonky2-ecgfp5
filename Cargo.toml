@@ -1,6 +1,6 @@
 [package]
 name = "plonky2_ecgfp5"
-version = "0.1.1"
+version = "0.2.0"
 edition = "2021"
 authors = ["Sebastien La Duca <sladuca777@gmail.com>"]
 readme = "README.md"
@@ -15,7 +15,7 @@ description = "plonky2 gadgets for EcGFp5 curve and base field arithmetic"
 plonky2 = { git = "https://github.com/okx/plonky2", branch = "dev-cliff-upgrade-v0.2.0" }
 plonky2_field = { git = "https://github.com/okx/plonky2", branch = "dev-cliff-upgrade-v0.2.0" }
 plonky2_ecdsa = { git = "https://github.com/doutv/plonky2-ecdsa.git" }
-plonky2_u32 = { git = "https://github.com/doutv/plonky2-u32.git"}
+plonky2_u32 = { git = "https://github.com/doutv/plonky2-u32.git" }
 num = "0.4"
 itertools = "0.10"
 serde = "1"
