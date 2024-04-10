@@ -14,8 +14,8 @@ description = "plonky2 gadgets for EcGFp5 curve and base field arithmetic"
 [dependencies]
 plonky2 = { git = "https://github.com/okx/plonky2", branch = "dev-cliff-upgrade-v0.2.0" }
 plonky2_field = { git = "https://github.com/okx/plonky2", branch = "dev-cliff-upgrade-v0.2.0" }
-plonky2_ecdsa = { git = "https://github.com/doutv/plonky2-ecdsa.git" }
-plonky2_u32 = { git = "https://github.com/doutv/plonky2-u32.git" }
+plonky2_ecdsa = { git = "https://github.com/okx/plonky2-ecdsa.git" }
+plonky2_u32 = { git = "https://github.com/okx/plonky2-u32.git" }
 num = "0.4"
 itertools = "0.10"
 serde = "1"
