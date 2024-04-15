@@ -724,7 +724,7 @@ dependencies = [
 [[package]]
 name = "plonky2_ecdsa"
 version = "0.2.0"
-source = "git+https://github.com/okx/plonky2-ecdsa.git#486572b09e8b67620982a257064a1b40f722a020"
+source = "git+https://github.com/okx/plonky2-ecdsa.git?rev=486572b09e8b67620982a257064a1b40f722a020#486572b09e8b67620982a257064a1b40f722a020"
 dependencies = [
  "anyhow",
  "itertools 0.10.5",
