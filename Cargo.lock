@@ -55,6 +55,29 @@ checksum = "f1fdabc7756949593fe60f30ec81974b613357de856987752631dea1e3394c80"
 
 [[package]]
 name = "bindgen"
+version = "0.68.1"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "726e4313eb6ec35d2730258ad4e15b547ee75d6afaa1361a922e78e59b7d8078"
+dependencies = [
+ "bitflags 2.5.0",
+ "cexpr",
+ "clang-sys",
+ "lazy_static",
+ "lazycell",
+ "log",
+ "peeking_take_while",
+ "prettyplease",
+ "proc-macro2",
+ "quote",
+ "regex",
+ "rustc-hash",
+ "shlex",
+ "syn 2.0.59",
+ "which",
+]
+
+[[package]]
+name = "bindgen"
 version = "0.69.4"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "a00dc851838a2120612785d195287475a3ac45514741da670b735818822129a0"
@@ -303,9 +326,9 @@ checksum = "7a81dae078cea95a014a339291cec439d2f232ebe854a9d672b796c6afafa9b7"
 [[package]]
 name = "cryptography_cuda"
 version = "0.1.0"
-source = "git+https://github.com/okx/plonky2?branch=dev-cliff-upgrade-v0.2.0#57b323e6f45d2ba614bafc6188f506e040d2ef8c"
+source = "git+ssh://git@github.com/okx/cryptography_cuda.git?rev=d44b861cf241d27688525e7a8f082199a2abcbfa#d44b861cf241d27688525e7a8f082199a2abcbfa"
 dependencies = [
- "bindgen",
+ "bindgen 0.69.4",
  "bit_reverse",
  "bitflags 1.3.2",
  "blst",
@@ -697,13 +720,19 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "e2355d85b9a3786f481747ced0e0ff2ba35213a1f9bd406ed906554d7af805a1"
 
 [[package]]
+name = "peeking_take_while"
+version = "0.1.2"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "19b17cddbe7ec3f8bc800887bab5e717348c95ea2ca0b1bf0837fb964dc67099"
+
+[[package]]
 name = "plonky2"
 version = "0.2.0"
-source = "git+https://github.com/okx/plonky2?branch=dev-cliff-upgrade-v0.2.0#57b323e6f45d2ba614bafc6188f506e040d2ef8c"
+source = "git+ssh://git@github.com/okx/plonky2.git?rev=15c3e7a8599158e29dda7e0423144d4798ce3581#15c3e7a8599158e29dda7e0423144d4798ce3581"
 dependencies = [
  "ahash",
  "anyhow",
- "bindgen",
+ "bindgen 0.68.1",
  "cryptography_cuda",
  "getrandom",
  "hashbrown 0.14.3",
@@ -711,6 +740,7 @@ dependencies = [
  "keccak-hash",
  "log",
  "num",
+ "once_cell",
  "plonky2_field",
  "plonky2_maybe_rayon 0.2.0",
  "plonky2_util",
@@ -724,7 +754,7 @@ dependencies = [
 [[package]]
 name = "plonky2_ecdsa"
 version = "0.2.0"
-source = "git+https://github.com/okx/plonky2-ecdsa.git?rev=486572b09e8b67620982a257064a1b40f722a020#486572b09e8b67620982a257064a1b40f722a020"
+source = "git+https://github.com/okx/plonky2-ecdsa.git?rev=313754a86a4375b29bd323173f0babba0b98ae54#313754a86a4375b29bd323173f0babba0b98ae54"
 dependencies = [
  "anyhow",
  "itertools 0.10.5",
@@ -756,10 +786,9 @@ dependencies = [
 [[package]]
 name = "plonky2_field"
 version = "0.2.0"
-source = "git+https://github.com/okx/plonky2?branch=dev-cliff-upgrade-v0.2.0#57b323e6f45d2ba614bafc6188f506e040d2ef8c"
+source = "git+ssh://git@github.com/okx/plonky2.git?rev=15c3e7a8599158e29dda7e0423144d4798ce3581#15c3e7a8599158e29dda7e0423144d4798ce3581"
 dependencies = [
  "anyhow",
- "cryptography_cuda",
  "itertools 0.11.0",
  "lazy_static",
  "num",
@@ -782,7 +811,7 @@ checksum = "194db0cbdd974e92d897cd92b74adb3968dc1b967315eb280357c49a7637994e"
 [[package]]
 name = "plonky2_maybe_rayon"
 version = "0.2.0"
-source = "git+https://github.com/okx/plonky2?branch=dev-cliff-upgrade-v0.2.0#57b323e6f45d2ba614bafc6188f506e040d2ef8c"
+source = "git+ssh://git@github.com/okx/plonky2.git?rev=15c3e7a8599158e29dda7e0423144d4798ce3581#15c3e7a8599158e29dda7e0423144d4798ce3581"
 dependencies = [
  "rayon",
 ]
@@ -790,7 +819,7 @@ dependencies = [
 [[package]]
 name = "plonky2_u32"
 version = "0.2.0"
-source = "git+https://github.com/okx/plonky2-u32.git#af6016d1a9afe8323bb2fe510f77378263cfe434"
+source = "git+https://github.com/okx/plonky2-u32.git?rev=fd0f2a6ac34eaf8fdca9eecc28e83bf28206fe8b#fd0f2a6ac34eaf8fdca9eecc28e83bf28206fe8b"
 dependencies = [
  "anyhow",
  "itertools 0.10.5",
@@ -801,7 +830,7 @@ dependencies = [
 [[package]]
 name = "plonky2_util"
 version = "0.2.0"
-source = "git+https://github.com/okx/plonky2?branch=dev-cliff-upgrade-v0.2.0#57b323e6f45d2ba614bafc6188f506e040d2ef8c"
+source = "git+ssh://git@github.com/okx/plonky2.git?rev=15c3e7a8599158e29dda7e0423144d4798ce3581#15c3e7a8599158e29dda7e0423144d4798ce3581"
 
 [[package]]
 name = "plotters"
