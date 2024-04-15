@@ -12,8 +12,8 @@ description = "plonky2 gadgets for EcGFp5 curve and base field arithmetic"
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
 [dependencies]
-plonky2 = { git = "https://github.com/okx/plonky2", branch = "dev-cliff-upgrade-v0.2.0" }
-plonky2_field = { git = "https://github.com/okx/plonky2", branch = "dev-cliff-upgrade-v0.2.0" }
+plonky2 = { git = "https://github.com/okx/plonky2", rev = "82e6ceffae4aa4123534fe3707ed6fa6f4521743" }
+plonky2_field = { git = "https://github.com/okx/plonky2", rev = "82e6ceffae4aa4123534fe3707ed6fa6f4521743" }
 plonky2_ecdsa = { git = "https://github.com/okx/plonky2-ecdsa.git", rev ="486572b09e8b67620982a257064a1b40f722a020" }
 plonky2_u32 = { git = "https://github.com/okx/plonky2-u32.git" }
 num = "0.4"
