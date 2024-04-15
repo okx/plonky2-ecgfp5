@@ -12,10 +12,10 @@ description = "plonky2 gadgets for EcGFp5 curve and base field arithmetic"
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
 [dependencies]
-plonky2 = { git = "ssh://git@github.com/okx/plonky2.git", rev= "15c3e7a8599158e29dda7e0423144d4798ce3581"}
-plonky2_field = { git = "ssh://git@github.com/okx/plonky2.git", rev= "15c3e7a8599158e29dda7e0423144d4798ce3581"}
-plonky2_ecdsa = { git = "https://github.com/okx/plonky2-ecdsa.git", rev ="313754a86a4375b29bd323173f0babba0b98ae54" }
-plonky2_u32 = { git = "https://github.com/okx/plonky2-u32.git", rev = "fd0f2a6ac34eaf8fdca9eecc28e83bf28206fe8b" }
+plonky2 = { git = "ssh://git@github.com/okx/plonky2.git", rev= "7cf50f1f78d369c157f955505b1e8902926eefba"}
+plonky2_field = { git = "ssh://git@github.com/okx/plonky2.git", rev= "7cf50f1f78d369c157f955505b1e8902926eefba"}
+plonky2_ecdsa = { git = "https://github.com/okx/plonky2-ecdsa.git", rev ="44363ab66ff64e66cf95b0c4c732a96eba6149b6" }
+plonky2_u32 = { git = "https://github.com/okx/plonky2-u32.git", rev = "5cea1766052f0e5935c2734e365077620b2b56de" }
 num = "0.4"
 itertools = "0.10"
 serde = "1"
