@@ -617,7 +617,7 @@ checksum = "19b17cddbe7ec3f8bc800887bab5e717348c95ea2ca0b1bf0837fb964dc67099"
 [[package]]
 name = "plonky2"
 version = "0.2.0"
-source = "git+ssh://git@github.com/okx/plonky2.git?rev=26ec79e66349af5ab1234274f738c174048ddadd#26ec79e66349af5ab1234274f738c174048ddadd"
+source = "git+ssh://git@github.com/okx/plonky2.git?rev=b507df837a3fe657b18fb3bbf1c6c4635ec977ab#b507df837a3fe657b18fb3bbf1c6c4635ec977ab"
 dependencies = [
  "ahash",
  "anyhow",
@@ -642,7 +642,7 @@ dependencies = [
 [[package]]
 name = "plonky2_ecdsa"
 version = "0.2.0"
-source = "git+https://github.com/okx/plonky2-ecdsa.git?rev=fce37e89f93d51080dbdd395ee78b07121c0f75a#fce37e89f93d51080dbdd395ee78b07121c0f75a"
+source = "git+https://github.com/okx/plonky2-ecdsa.git?rev=b766455fae5a450615610f00ed32ddf643dd8d9e#b766455fae5a450615610f00ed32ddf643dd8d9e"
 dependencies = [
  "anyhow",
  "itertools 0.10.5",
@@ -674,7 +674,7 @@ dependencies = [
 [[package]]
 name = "plonky2_field"
 version = "0.2.0"
-source = "git+ssh://git@github.com/okx/plonky2.git?rev=26ec79e66349af5ab1234274f738c174048ddadd#26ec79e66349af5ab1234274f738c174048ddadd"
+source = "git+ssh://git@github.com/okx/plonky2.git?rev=b507df837a3fe657b18fb3bbf1c6c4635ec977ab#b507df837a3fe657b18fb3bbf1c6c4635ec977ab"
 dependencies = [
  "anyhow",
  "itertools 0.11.0",
@@ -699,7 +699,7 @@ checksum = "194db0cbdd974e92d897cd92b74adb3968dc1b967315eb280357c49a7637994e"
 [[package]]
 name = "plonky2_maybe_rayon"
 version = "0.2.0"
-source = "git+ssh://git@github.com/okx/plonky2.git?rev=26ec79e66349af5ab1234274f738c174048ddadd#26ec79e66349af5ab1234274f738c174048ddadd"
+source = "git+ssh://git@github.com/okx/plonky2.git?rev=b507df837a3fe657b18fb3bbf1c6c4635ec977ab#b507df837a3fe657b18fb3bbf1c6c4635ec977ab"
 dependencies = [
  "rayon",
 ]
@@ -707,7 +707,7 @@ dependencies = [
 [[package]]
 name = "plonky2_u32"
 version = "0.2.0"
-source = "git+https://github.com/okx/plonky2-u32.git?rev=1a7d07115f6ba830994896194d775692e1589f49#1a7d07115f6ba830994896194d775692e1589f49"
+source = "git+https://github.com/okx/plonky2-u32.git?rev=aef22731c05622ce2303f940a7e393e6c3acf231#aef22731c05622ce2303f940a7e393e6c3acf231"
 dependencies = [
  "anyhow",
  "itertools 0.10.5",
@@ -718,7 +718,7 @@ dependencies = [
 [[package]]
 name = "plonky2_util"
 version = "0.2.0"
-source = "git+ssh://git@github.com/okx/plonky2.git?rev=26ec79e66349af5ab1234274f738c174048ddadd#26ec79e66349af5ab1234274f738c174048ddadd"
+source = "git+ssh://git@github.com/okx/plonky2.git?rev=b507df837a3fe657b18fb3bbf1c6c4635ec977ab#b507df837a3fe657b18fb3bbf1c6c4635ec977ab"
 
 [[package]]
 name = "plotters"
