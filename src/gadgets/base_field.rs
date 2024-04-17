@@ -719,7 +719,7 @@ impl CircuitBuilderGFp5<GFp> for CircuitBuilder<GFp, 2> {
 // impl_circuit_builder_for_extension_degree!(4);
 // impl_circuit_builder_for_extension_degree!(5);
 
-#[derive(Debug)]
+#[derive(Debug, Clone)]
 pub struct QuinticQuotientGenerator {
     numerator: QuinticExtensionTarget,
     denominator: QuinticExtensionTarget,
@@ -794,7 +794,7 @@ impl<F: RichField + Extendable<5> + Extendable<2>> SimpleGenerator<F, 2>
     }
 }
 
-#[derive(Debug)]
+#[derive(Debug, Clone)]
 pub struct QuinticSqrtGenerator {
     x: QuinticExtensionTarget,
     root_x: QuinticExtensionTarget,
