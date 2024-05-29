@@ -25,7 +25,7 @@ use super::GFp5;
 /// ```ignore
 /// P = 1067993516717146951041484916571792702745057740581727230159139685185762082554198619328292418486241
 /// ```
-#[derive(Copy, Clone, Serialize, Deserialize)]
+#[derive(Copy, Clone, Serialize, Deserialize, PartialOrd, Ord)]
 pub struct Scalar(pub [u64; 5]);
 
 impl Default for Scalar {
