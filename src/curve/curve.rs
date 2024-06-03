@@ -6,9 +6,10 @@ use std::ops::{Add, AddAssign, Mul, MulAssign, Neg, Sub, SubAssign};
 
 use alloc::vec::Vec;
 use plonky2_field::extension::quintic::QuinticExtension;
+use plonky2_field::extension::FieldExtension;
 use plonky2_field::goldilocks_field::GoldilocksField;
 use plonky2_field::ops::Square;
-use plonky2_field::types::{Field, Sample};
+use plonky2_field::types::{Field, PrimeField64, Sample};
 use rand::RngCore;
 
 use crate::curve::base_field::{Legendre, SquareRoot};
@@ -230,6 +231,16 @@ impl Point {
         self.t * self.u.inverse_or_zero()
     }
 
+    /// Little endian
+    pub fn to_le_bytes(self) -> [u8; 40] {
+        let gfp5: [GFp; 5]  = self.encode().to_basefield_array();
+        gfp5.iter().fold(vec![], |mut acc, gfp| {
+            let bytes = gfp.to_canonical_u64().to_le_bytes();
+            acc.extend_from_slice(&bytes);
+            acc
+        }).try_into().unwrap()
+    }
+
     /// Test whether a field element can be decoded into a point.
     /// returns `true` if decoding would work, `false` otherwise.
     pub fn validate(w: GFp5) -> bool {
@@ -238,6 +249,19 @@ impl Point {
         let e = w.square() - Self::A;
         let delta = e.square() - Self::B_MUL4;
         w == GFp5::ZERO || delta.legendre() == GFp::ONE
+    }
+
+    /// Little endian
+    pub fn from_le_bytes(buf: [u8; 40]) -> Option<Self> {
+        let gfp5: [GFp; 5] = (0..5).map(|i| {
+            GFp::from_canonical_u64(u64::from_le_bytes(buf[i * 8..(i + 1) * 8].try_into().unwrap()))
+        }).collect::<Vec<GFp>>().try_into().unwrap();
+        let w = GFp5::from_basefield_array(gfp5);
+        if Self::validate(w) {
+            Self::decode(w)
+        } else {
+            None
+        }
     }
 
     /// Attempt to decode a point from a field element
@@ -1700,6 +1724,17 @@ mod tests {
 
             let r2 = r + Point::GENERATOR;
             assert!(!q.verify_muladd_vartime(s, k, r2));
+        }
+    }
+
+    #[test]
+    fn test_to_from_le_bytes() {
+        let mut rng = thread_rng();
+        for _ in 0..20 {
+            let point = Point::sample(&mut rng);
+            let bytes = point.to_le_bytes();
+            let decoded = Point::from_le_bytes(bytes).expect("decoding should succeed");
+            assert_eq!(point, decoded);
         }
     }
 }
