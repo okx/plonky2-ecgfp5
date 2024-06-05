@@ -3,16 +3,17 @@
 /// with some modifications to make it play more nicely with plonky2 primitives
 /// His implementation can be found here: https://github.com/pornin/ecgfp5
 use alloc::vec::Vec;
-use core::fmt::{self, Debug, Display, Formatter};
-use core::hash::{Hash, Hasher};
-use core::iter::{Product, Sum};
-use core::ops::{Add, AddAssign, Div, DivAssign, Mul, MulAssign, Neg, Sub, SubAssign};
+use core::{
+    fmt::{self, Debug, Display, Formatter},
+    hash::{Hash, Hasher},
+    iter::{Product, Sum},
+    ops::{Add, AddAssign, Div, DivAssign, Mul, MulAssign, Neg, Sub, SubAssign},
+};
 use plonky2_field::extension::quintic::QuinticExtension;
 use rand::RngCore;
 
 use itertools::Itertools;
-use num::bigint::BigUint;
-use num::One;
+use num::{bigint::BigUint, One};
 use serde::{Deserialize, Serialize};
 
 use plonky2_field::types::{Field, PrimeField, PrimeField64, Sample};
@@ -198,10 +199,7 @@ impl Field for Scalar {
     fn from_noncanonical_biguint(val: BigUint) -> Self {
         let val = val % Self::order();
         Self(
-            val.to_u64_digits()
-                .into_iter()
-                .pad_using(5, |_| 0)
-                .collect::<Vec<_>>()[..]
+            val.to_u64_digits().into_iter().pad_using(5, |_| 0).collect::<Vec<_>>()[..]
                 .try_into()
                 .expect("error converting to u64 array"),
         )
@@ -318,9 +316,7 @@ impl Scalar {
         let mut r = Self::ZERO;
         let mut c: u64 = 0;
         for i in 0..5 {
-            let z = (self.0[i] as u128)
-                .wrapping_add(a.0[i] as u128)
-                .wrapping_add(c as u128);
+            let z = (self.0[i] as u128).wrapping_add(a.0[i] as u128).wrapping_add(c as u128);
             r.0[i] = z as u64;
             c = (z >> 64) as u64;
         }
@@ -334,9 +330,7 @@ impl Scalar {
         let mut r = Self::ZERO;
         let mut c: u64 = 0;
         for i in 0..5 {
-            let z = (self.0[i] as u128)
-                .wrapping_sub(a.0[i] as u128)
-                .wrapping_sub(c as u128);
+            let z = (self.0[i] as u128).wrapping_sub(a.0[i] as u128).wrapping_sub(c as u128);
             r.0[i] = z as u64;
             c = ((z >> 64) as u64) & 1;
         }
@@ -393,10 +387,7 @@ impl Scalar {
             //                         < 2^384
             // Thus, the new r fits on 320 bits.
             let m = rhs.0[i];
-            let f = self.0[0]
-                .wrapping_mul(m)
-                .wrapping_add(r.0[0])
-                .wrapping_mul(Self::N0I);
+            let f = self.0[0].wrapping_mul(m).wrapping_add(r.0[0]).wrapping_mul(Self::N0I);
             let mut cc1: u64 = 0;
             let mut cc2: u64 = 0;
             for j in 0..5 {
@@ -767,9 +758,7 @@ impl Signed161 {
             let vw = v[i - j];
             let vws = vw.wrapping_shl(s as u32) | vbits;
             vbits = vw.wrapping_shr((64 - s) as u32);
-            let z = (self.0[i] as u128)
-                .wrapping_sub(vws as u128)
-                .wrapping_sub(cc as u128);
+            let z = (self.0[i] as u128).wrapping_sub(vws as u128).wrapping_sub(cc as u128);
             self.0[i] = z as u64;
             cc = ((z >> 64) as u64) & 1;
         }
@@ -779,9 +768,7 @@ impl Signed161 {
         let mut cc = 0;
         let j = 3 - v.len();
         for i in j..3 {
-            let z = (self.0[i] as u128)
-                .wrapping_sub(v[i - j] as u128)
-                .wrapping_sub(cc as u128);
+            let z = (self.0[i] as u128).wrapping_sub(v[i - j] as u128).wrapping_sub(cc as u128);
             self.0[i] = z as u64;
             cc = ((z >> 64) as u64) & 1;
         }
@@ -957,9 +944,7 @@ impl Signed640 {
             let vw = v[i - j];
             let vws = vw.wrapping_shl(s as u32) | vbits;
             vbits = vw.wrapping_shr((64 - s) as u32);
-            let z = (self.0[i] as u128)
-                .wrapping_sub(vws as u128)
-                .wrapping_sub(cc as u128);
+            let z = (self.0[i] as u128).wrapping_sub(vws as u128).wrapping_sub(cc as u128);
             self.0[i] = z as u64;
             cc = ((z >> 64) as u64) & 1;
         }
@@ -969,9 +954,7 @@ impl Signed640 {
         let mut cc = 0;
         let j = 10 - v.len();
         for i in j..10 {
-            let z = (self.0[i] as u128)
-                .wrapping_sub(v[i - j] as u128)
-                .wrapping_sub(cc as u128);
+            let z = (self.0[i] as u128).wrapping_sub(v[i - j] as u128).wrapping_sub(cc as u128);
             self.0[i] = z as u64;
             cc = ((z >> 64) as u64) & 1;
         }

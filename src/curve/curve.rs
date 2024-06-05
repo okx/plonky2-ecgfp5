@@ -12,10 +12,12 @@ use plonky2_field::ops::Square;
 use plonky2_field::types::{Field, PrimeField64, Sample};
 use rand::RngCore;
 
-use crate::curve::base_field::{Legendre, SquareRoot};
-use crate::curve::mul_table::*;
-use crate::curve::scalar_field::Scalar;
-use crate::curve::{GFp, GFp5};
+use crate::curve::{
+    base_field::{Legendre, SquareRoot},
+    mul_table::*,
+    scalar_field::Scalar,
+    GFp, GFp5,
+};
 
 use super::base_field::InverseOrZero;
 
@@ -65,11 +67,7 @@ impl WeierstrassPoint {
         GFp::ZERO,
     ]);
 
-    pub const NEUTRAL: Self = Self {
-        x: GFp5::ZERO,
-        y: GFp5::ZERO,
-        is_inf: true,
-    };
+    pub const NEUTRAL: Self = Self { x: GFp5::ZERO, y: GFp5::ZERO, is_inf: true };
 
     pub const GENERATOR: Self = Self {
         x: QuinticExtension([
@@ -107,11 +105,7 @@ impl WeierstrassPoint {
         let x = if x1.legendre() == GFp::ONE { x1 } else { x2 };
 
         let y = -w * x;
-        let x = if c {
-            x + Point::A / GFp5::from_canonical_u16(3)
-        } else {
-            GFp5::ZERO
-        };
+        let x = if c { x + Point::A / GFp5::from_canonical_u16(3) } else { GFp5::ZERO };
         let is_inf = !c;
 
         // If w == 0 then this is in fact a success.
@@ -151,13 +145,8 @@ impl Point {
         QuinticExtension([GFp::TWO, GFp::ZERO, GFp::ZERO, GFp::ZERO, GFp::ZERO]);
     pub const B1: u64 = 263;
 
-    pub(crate) const B: GFp5 = QuinticExtension([
-        GFp::ZERO,
-        GoldilocksField(Self::B1),
-        GFp::ZERO,
-        GFp::ZERO,
-        GFp::ZERO,
-    ]);
+    pub(crate) const B: GFp5 =
+        QuinticExtension([GFp::ZERO, GoldilocksField(Self::B1), GFp::ZERO, GFp::ZERO, GFp::ZERO]);
 
     // 2*b
     pub(crate) const B_MUL2: GFp5 = QuinticExtension([
@@ -185,12 +174,7 @@ impl Point {
     ]);
 
     /// The neutral point (neutral of the group law).
-    pub const NEUTRAL: Self = Self {
-        x: GFp5::ZERO,
-        z: GFp5::ONE,
-        u: GFp5::ZERO,
-        t: GFp5::ONE,
-    };
+    pub const NEUTRAL: Self = Self { x: GFp5::ZERO, z: GFp5::ONE, u: GFp5::ZERO, t: GFp5::ONE };
 
     /// The conventional generator (corresponding to encoding w = 4).
     pub const GENERATOR: Self = Self {
@@ -202,20 +186,8 @@ impl Point {
             GoldilocksField(2448410071095648785),
         ]),
         z: GFp5::ONE,
-        u: QuinticExtension([
-            GoldilocksField(1),
-            GFp::ZERO,
-            GFp::ZERO,
-            GFp::ZERO,
-            GFp::ZERO,
-        ]),
-        t: QuinticExtension([
-            GoldilocksField(4),
-            GFp::ZERO,
-            GFp::ZERO,
-            GFp::ZERO,
-            GFp::ZERO,
-        ]),
+        u: QuinticExtension([GoldilocksField(1), GFp::ZERO, GFp::ZERO, GFp::ZERO, GFp::ZERO]),
+        t: QuinticExtension([GoldilocksField(4), GFp::ZERO, GFp::ZERO, GFp::ZERO, GFp::ZERO]),
     };
 
     pub fn is_x_zero(&self) -> bool {
@@ -353,10 +325,7 @@ impl Point {
 
     // Subtract a point in affine coordinates from this one.
     fn set_sub_affine(&mut self, rhs: &AffinePoint) {
-        self.set_add_affine(&AffinePoint {
-            x: rhs.x,
-            u: -rhs.u,
-        })
+        self.set_add_affine(&AffinePoint { x: rhs.x, u: -rhs.u })
     }
 
     fn set_neg(&mut self) {
@@ -470,10 +439,7 @@ impl Point {
             1 => {
                 let p = src[0];
                 let m1 = (p.z * p.t).inverse_or_zero();
-                let res = AffinePoint {
-                    x: p.x * p.t * m1,
-                    u: p.u * p.z * m1,
-                };
+                let res = AffinePoint { x: p.x * p.t * m1, u: p.u * p.z * m1 };
 
                 vec![res]
             }
@@ -662,19 +628,11 @@ impl Point {
 }
 
 impl AffinePoint {
-    pub(crate) const NEUTRAL: Self = Self {
-        x: GFp5::ZERO,
-        u: GFp5::ZERO,
-    };
+    pub(crate) const NEUTRAL: Self = Self { x: GFp5::ZERO, u: GFp5::ZERO };
 
     fn to_point(self) -> Point {
         let Self { x, u } = self;
-        Point {
-            x,
-            z: GFp5::ONE,
-            u,
-            t: GFp5::ONE,
-        }
+        Point { x, z: GFp5::ONE, u, t: GFp5::ONE }
     }
 
     fn set_neg(&mut self) {
@@ -1418,10 +1376,8 @@ mod tests {
             assert_eq!(q1, q2);
         }
 
-        let p2_affine = AffinePoint {
-            x: p2.x * p2.z.inverse_or_zero(),
-            u: p2.u * p2.t.inverse_or_zero(),
-        };
+        let p2_affine =
+            AffinePoint { x: p2.x * p2.z.inverse_or_zero(), u: p2.u * p2.t.inverse_or_zero() };
         assert_eq!(p1 + p2_affine, p1 + p2);
     }
 
