@@ -5,11 +5,13 @@
 use std::ops::{Add, AddAssign, Mul, MulAssign, Neg, Sub, SubAssign};
 
 use alloc::vec::Vec;
-use plonky2_field::extension::quintic::QuinticExtension;
-use plonky2_field::extension::FieldExtension;
-use plonky2_field::goldilocks_field::GoldilocksField;
-use plonky2_field::ops::Square;
-use plonky2_field::types::{Field, PrimeField64, Sample};
+use plonky2_field::{
+    extension::{quintic::QuinticExtension, FieldExtension},
+    goldilocks_field::GoldilocksField,
+    ops::Square,
+    packed::PackedField,
+    types::{Field, PrimeField64, Sample},
+};
 use rand::RngCore;
 
 use crate::curve::{
@@ -205,12 +207,15 @@ impl Point {
 
     /// Little endian
     pub fn to_le_bytes(self) -> [u8; 40] {
-        let gfp5: [GFp; 5]  = self.encode().to_basefield_array();
-        gfp5.iter().fold(vec![], |mut acc, gfp| {
-            let bytes = gfp.to_canonical_u64().to_le_bytes();
-            acc.extend_from_slice(&bytes);
-            acc
-        }).try_into().unwrap()
+        let gfp5: [GFp; 5] = self.encode().to_basefield_array();
+        gfp5.iter()
+            .fold(vec![], |mut acc, gfp| {
+                let bytes = gfp.to_canonical_u64().to_le_bytes();
+                acc.extend_from_slice(&bytes);
+                acc
+            })
+            .try_into()
+            .unwrap()
     }
 
     /// Test whether a field element can be decoded into a point.
@@ -225,9 +230,15 @@ impl Point {
 
     /// Little endian
     pub fn from_le_bytes(buf: [u8; 40]) -> Option<Self> {
-        let gfp5: [GFp; 5] = (0..5).map(|i| {
-            GFp::from_canonical_u64(u64::from_le_bytes(buf[i * 8..(i + 1) * 8].try_into().unwrap()))
-        }).collect::<Vec<GFp>>().try_into().unwrap();
+        let gfp5: [GFp; 5] = (0..5)
+            .map(|i| {
+                GFp::from_canonical_u64(u64::from_le_bytes(
+                    buf[i * 8..(i + 1) * 8].try_into().unwrap(),
+                ))
+            })
+            .collect::<Vec<GFp>>()
+            .try_into()
+            .unwrap();
         let w = GFp5::from_basefield_array(gfp5);
         if Self::validate(w) {
             Self::decode(w)
@@ -275,6 +286,46 @@ impl Point {
     pub fn to_weierstrass(&self) -> WeierstrassPoint {
         let w = self.encode();
         WeierstrassPoint::decode(w).unwrap()
+    }
+
+    pub fn to_hex_string(&self) -> String {
+        let mut buf: [u8; 5 * 8] = [0; 40];
+        let dst_ptr = buf.as_mut_ptr();
+
+        let mut offset = 0;
+
+        let encode = Point::encode(*self);
+        for e in encode.0 {
+            let bytes = e.to_canonical_u64().to_le_bytes();
+            unsafe {
+                std::ptr::copy_nonoverlapping(bytes.as_ptr(), dst_ptr.add(offset), 8);
+            }
+            offset = offset + 8;
+        }
+
+        let hex_string = hex::encode(&buf);
+        hex_string
+    }
+
+    pub fn from_hex_string(input_hex_string: &str) -> Self {
+        let buf: Vec<u8> = hex::decode(input_hex_string).unwrap();
+        let mut data: [GoldilocksField; 5] = [GoldilocksField::ZERO; 5];
+
+        let src_ptr = buf.as_ptr();
+        let mut offset = 0;
+        for ele in data.iter_mut() {
+            unsafe {
+                let mut v_buf: [u8; 8] = [0; 8];
+                std::ptr::copy_nonoverlapping(src_ptr.add(offset), v_buf.as_mut_ptr(), 8);
+                let v: u64 = u64::from_le_bytes(v_buf);
+                *ele = GoldilocksField::from_canonical_u64(v);
+            }
+            offset = offset + 8;
+        }
+
+        let quintic = QuinticExtension::<GoldilocksField>(data);
+        let decoded = Self::decode(quintic).unwrap();
+        decoded
     }
 
     // General point addition. formulas are complete (no special case).
@@ -1681,6 +1732,22 @@ mod tests {
             let r2 = r + Point::GENERATOR;
             assert!(!q.verify_muladd_vartime(s, k, r2));
         }
+    }
+
+    #[test]
+    fn test_point_convert_str() {
+        let w1 = QuinticExtension([
+            GoldilocksField(7534507442095725921),
+            GoldilocksField(16658460051907528927),
+            GoldilocksField(12417574136563175256),
+            GoldilocksField(2750788641759288856),
+            GoldilocksField(620002843272906439),
+        ]);
+
+        let p1 = Point::decode(w1).expect("w1 should successfully decode");
+        let hex_str = p1.to_hex_string();
+        let recoverred = Point::from_hex_string(&hex_str);
+        assert_eq!(p1, recoverred);
     }
 
     #[test]

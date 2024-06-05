@@ -644,6 +644,45 @@ impl Scalar {
             | (self.0[4] ^ rhs.0[4]);
         ((x | x.wrapping_neg()) >> 63).wrapping_sub(1)
     }
+
+    pub fn to_hex_string(&self) -> String {
+        let u64_array = self.0;
+
+        let mut buf: [u8; 40] = [0; 40];
+        let dst_ptr = buf.as_mut_ptr();
+
+        let mut offset = 0;
+        for e in u64_array {
+            let bytes = e.to_le_bytes();
+            unsafe {
+                let src_ptr = bytes.as_ptr();
+                std::ptr::copy_nonoverlapping(src_ptr, dst_ptr.add(offset), 8);
+                offset = offset + 8;
+            }
+        }
+
+        let hex_string = hex::encode(&buf);
+        hex_string
+    }
+
+    pub fn from_hex_string(input_hex_string: &str) -> Self {
+        let buf: Vec<u8> = hex::decode(input_hex_string).unwrap();
+        let mut data: [u64; 5] = [0; 5];
+
+        let src_ptr = buf.as_ptr();
+        let mut offset = 0;
+        for ele in data.iter_mut() {
+            unsafe {
+                let mut v_buf: [u8; 8] = [0; 8];
+                std::ptr::copy_nonoverlapping(src_ptr.add(offset), v_buf.as_mut_ptr(), 8);
+                let v: u64 = u64::from_le_bytes(v_buf);
+                *ele = v;
+            }
+            offset = offset + 8;
+        }
+
+        Self(data)
+    }
 }
 
 /// A custom 161-bit integer type; used for splitting a scalar into a
@@ -1092,6 +1131,23 @@ mod tests {
             let c1 = v1.to_scalar_vartime();
             assert!((c1 * s - c0).iszero() == 0xFFFFFFFFFFFFFFFF);
         }
+    }
+
+    #[test]
+    fn test_convert_hex_str() {
+        // buf4 = a randomly chosen 512-bit integer
+        let buf4: [u8; 64] = [
+            0xB5, 0xDD, 0x28, 0xB8, 0xD2, 0x9B, 0x6F, 0xF8, 0x15, 0x65, 0x3F, 0x89, 0xDB, 0x7B,
+            0xA9, 0xDE, 0x33, 0x7D, 0xA8, 0x27, 0x82, 0x26, 0xB4, 0xD6, 0x9E, 0x1F, 0xFA, 0x97,
+            0x3D, 0x9E, 0x01, 0x9C, 0x77, 0xC9, 0x63, 0x5C, 0xB8, 0x34, 0xD8, 0x1A, 0x4D, 0xCB,
+            0x03, 0x48, 0x62, 0xCD, 0xEE, 0xC9, 0x8E, 0xC8, 0xC9, 0xA7, 0xB3, 0x6E, 0xDA, 0xCE,
+            0x18, 0x75, 0x1B, 0xDD, 0x4F, 0x94, 0x67, 0xB5,
+        ];
+
+        let s4 = Scalar::from_noncanonical_bytes(&buf4[..]);
+        let hex_str = s4.to_hex_string();
+        let recoverred = Scalar::from_hex_string(&hex_str);
+        assert_eq!(s4, recoverred);
     }
 
     test_field_arithmetic!(crate::curve::scalar_field::Scalar);
