@@ -504,6 +504,16 @@ impl Scalar {
         acc
     }
 
+    /// Decode 40 bytes into a scalar. If it is larger than the group order, return None.
+    pub fn from_canonical_bytes(buf: [u8; 40]) -> Option<Self> {
+        let (scalar, carry) = Self::try_from_noncanonical_bytes(&buf);
+        if carry == 0xFFFFFFFFFFFFFFFF {
+            Some(scalar)
+        } else {
+            None
+        }
+    }
+
     /// Encode this scalar over exactly 40 bytes.
     pub fn encode(self) -> [u8; 40] {
         let mut r = [0u8; 40];
@@ -1045,6 +1055,13 @@ mod tests {
         let (s5, c5) = Scalar::try_from_noncanonical_bytes(&buf5[..]);
         assert!(c5 == 0xFFFFFFFFFFFFFFFF);
         assert!(s5.encode() == buf5);
+        {
+            let should_be_none = Scalar::from_canonical_bytes(&buf4);
+            assert!(should_be_none.is_none());
+            let should_be_some = Scalar::from_canonical_bytes(&buf5);
+            assert!(should_be_some.is_some());
+            assert!(should_be_some.unwrap() == s5);
+        }
 
         // buf6 = (buf4^256) mod n
         let buf6: [u8; 40] = [
