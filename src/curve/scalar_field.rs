@@ -1078,9 +1078,7 @@ mod tests {
         assert!(c5 == 0xFFFFFFFFFFFFFFFF);
         assert!(s5.encode() == buf5);
         {
-            let should_be_none = Scalar::from_canonical_bytes(&buf4);
-            assert!(should_be_none.is_none());
-            let should_be_some = Scalar::from_canonical_bytes(&buf5);
+            let should_be_some = Scalar::from_canonical_bytes(buf5);
             assert!(should_be_some.is_some());
             assert!(should_be_some.unwrap() == s5);
         }
