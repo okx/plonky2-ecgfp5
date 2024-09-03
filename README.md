@@ -1,4 +1,5 @@
 # plonky2-ecgfp5
+# Move to https://github.com/okx/plonky2
 
 > DISCLAIMER: this is a prototype. It hasn't been audited. It probably has bugs. DO NOT USE THIS IN PRODUCTION.
 
